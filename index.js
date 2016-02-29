@@ -184,6 +184,7 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
+
   var field, i, j, len, lineAsColumns;
   if (this.options.columns === true) {
     this.options.columns = line;
@@ -394,7 +395,20 @@ Parser.prototype.__write = function(chars, end, callback) {
   }
   return results;
 };
-var csvTransform = new Parser();
+var csvTransform = new Parser({'columns':true,'objname':'Country Name'});
 
 writeStream = fs.createWriteStream(__dirname + '/csv/test.txt')
-fs.createReadStream(__dirname + '/csv/test.csv').pipe(csvTransform).pipe(writeStream);
+fs.createReadStream(__dirname + '/csv/WDI_Data.csv').pipe(csvTransform);
+var gdpGniConstant =[];
+var gdpGniPerCapita=[];
+var gdpGrowthOfIndia =[];
+var gdpByContinent =[];
+ csvTransform.on('readable',function(){
+   while(record = csvTransform.read()){
+      //array is becoming big they should be split here!
+       myArr.push(record);
+  }
+});
+csvTransform.on('finish',function(){
+//the array need s to be filtered.
+});
