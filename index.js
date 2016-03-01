@@ -48,8 +48,6 @@ Parser = function(options) {
   this.count = 0;
   this.decoder = new StringDecoder();
   this.buf = '';
-  //this.quoting = false;
-  this.commenting = false;
   this.field = '';
   this.nextChar = null;
   this.closingQuote = 0;
@@ -80,7 +78,7 @@ Parser.prototype._flush = function(callback) {
   var err;
   try {
     this.__write(this.decoder.end(), true);
-      if (this.line.length > 0) {
+    if (this.line.length > 0) {
       this.__push(this.line);
     }
     return callback();
@@ -91,7 +89,7 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
-    var field, i, j, len, lineAsColumns;
+  var field, i, j, len, lineAsColumns;
   if (this.options.columns === true) {
     this.options.columns = line;
     return;
@@ -111,7 +109,7 @@ Parser.prototype.__push = function(line) {
 };
 
 Parser.prototype.__write = function(chars, end, callback) {
-  var acceptedLength, char, escapeIsQuote, i, isDelimiter, isEscape,isQuote, isRowDelimiter, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
+  var acceptedLength, char, escapeIsQuote, i, isDelimiter, isEscape, isQuote, isRowDelimiter, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
   ltrim = false;
   rtrim = false;
   chars = this.buf + chars;
@@ -160,7 +158,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       this.lines++;
     }
     isDelimiter = chars.substr(i, this.options.delimiter.length) === this.options.delimiter;
-    if (!this.commenting && (isDelimiter || isRowDelimiter)) {
+    if (isDelimiter || isRowDelimiter) {
       if (isRowDelimiter && this.line.length === 0 && this.field === '') {
         if (wasCommenting) {
           i += this.options.rowDelimiter.length;
@@ -191,7 +189,7 @@ Parser.prototype.__write = function(chars, end, callback) {
         this.nextChar = chars.charAt(i);
         continue;
       }
-    } else if (!this.commenting && (char === ' ' || char === '\t')) {
+    } else if (char === ' ' || char === '\t') {
       if (!(ltrim && !this.field)) {
         this.field += char;
       }
@@ -200,14 +198,14 @@ Parser.prototype.__write = function(chars, end, callback) {
         this.line.push(this.field);
       }
       i++;
-    } else if (!this.commenting) {
+    } else {
+
       this.field += char;
       i++;
       if (end && i === l) {
         this.line.push(this.field);
       }
-    } else {
-      i++;
+
     }
   }
   this.buf = '';
