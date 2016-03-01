@@ -9,35 +9,36 @@ StringDecoder = require('string_decoder').StringDecoder;
 fs = require('fs');
 
 module.exports = function() {
-  var callback, called, chunks, data, options, parser;
-  if (arguments.length === 3) {
-    data = arguments[0];
-    options = arguments[1];
-    callback = arguments[2];
-    if (typeof callback !== 'function') {
-      throw Error("Invalid callback argument: " + (JSON.stringify(callback)));
-    }
-    if (!(typeof data === 'string' || Buffer.isBuffer(arguments[0]))) {
-      return callback(Error("Invalid data argument: " + (JSON.stringify(data))));
-    }
-  } else if (arguments.length === 2) {
-    if (typeof arguments[0] === 'string' || Buffer.isBuffer(arguments[0])) {
-      data = arguments[0];
-    } else {
-      options = arguments[0];
-    }
-    if (typeof arguments[1] === 'function') {
-      callback = arguments[1];
-    } else {
-      options = arguments[1];
-    }
-  } else if (arguments.length === 1) {
-    if (typeof arguments[0] === 'function') {
-      callback = arguments[0];
-    } else {
-      options = arguments[0];
-    }
-  }
+  // var callback, called, chunks, data, options, parser;
+  // if (arguments.length === 3) {
+  //   data = arguments[0];
+  //   options = arguments[1];
+  //   callback = arguments[2];
+  //   if (typeof callback !== 'function') {
+  //     throw Error("Invalid callback argument: " + (JSON.stringify(callback)));
+  //   }
+  //   if (!(typeof data === 'string' || Buffer.isBuffer(arguments[0]))) {
+  //     return callback(Error("Invalid data argument: " + (JSON.stringify(data))));
+  //   }
+  // } else if (arguments.length === 2) {
+  //   debugger;
+  //   if (typeof arguments[0] === 'string' || Buffer.isBuffer(arguments[0])) {
+  //     data = arguments[0];
+  //   } else {
+  //     options = arguments[0];
+  //   }
+  //   if (typeof arguments[1] === 'function') {
+  //     callback = arguments[1];
+  //   } else {
+  //     options = arguments[1];
+  //   }
+  // } else if (arguments.length === 1) {
+  //   if (typeof arguments[0] === 'function') {
+  //     callback = arguments[0];
+  //   } else {
+  //     options = arguments[0];
+  //   }
+  // }
   if (options == null) {
     options = {};
   }
@@ -129,7 +130,7 @@ Parser = function(options) {
   }
   this.lines = 0;
   this.count = 0;
-//  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
+  //  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
   // this.is_float = function(value) {
   //   return (value - parseFloat(value) + 1) >= 0;
   // };
@@ -207,21 +208,18 @@ Parser.prototype.__push = function(line) {
 
 Parser.prototype.__write = function(chars, end, callback) {
   var acceptedLength, areNextCharsDelimiter, areNextCharsRowDelimiters, auto_parse, char, escapeIsQuote, i, isDelimiter, isEscape, isNextCharAComment, isQuote, isRowDelimiter, is_float, is_int, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
-  debugger;
-  // ltrim = this.options.trim || this.options.ltrim;
-  // rtrim = this.options.trim || this.options.rtrim;
-  ltrim=false;
-  rtrim=false;
+  ltrim = false;
+  rtrim = false;
   chars = this.buf + chars;
   l = chars.length;
-  rowDelimiterLength=0;
+  rowDelimiterLength = 0;
   i = 0;
   if (this.lines === 0 && 0xFEFF === chars.charCodeAt(0)) {
     i++;
   }
   while (i < l) {
-      acceptedLength=2;
-      if (!end && (i + acceptedLength >= l)) {
+    acceptedLength = 2;
+    if (!end && (i + acceptedLength >= l)) {
       break;
     }
     char = this.nextChar ? this.nextChar : chars.charAt(i);
@@ -372,7 +370,7 @@ var gdpGniKeyArray = ['GDP at market prices (constant 2005 US$)', 'GNI (constant
 var gdpGniPerCapitaKeyArray = ['GDP per capita (constant 2005 US$)', 'GNI per capita (constant 2005 US$)'];
 var gdpGrowthIndiaKey = 'GDP growth (annual %)';
 var indiaCountryName = 'India';
-var aggregatedGdpPerCapitaKey ='GDP per capita (constant 2005 US$)';
+var aggregatedGdpPerCapitaKey = 'GDP per capita (constant 2005 US$)';
 
 csvTransform.on('readable', function() {
   while (record = csvTransform.read()) {
@@ -398,7 +396,7 @@ csvTransform.on('finish', function() {
   //sorting
 
 
-//write file
+  //write file
   fs.writeFile(__dirname + '/csv/test_gdp.json', JSON.stringify(gdpGniConstant));
   fs.writeFile(__dirname + '/csv/test_gni.json', JSON.stringify(gdpGniPerCapita));
   fs.writeFile(__dirname + '/csv/growth_gdp_india.json', JSON.stringify(gdpGrowthOfIndia));
