@@ -10,36 +10,17 @@ fs = require('fs');
 
 module.exports = function() {
   //set up options to make this independent
-  if (options == null) {
-    options = {};
-  }
+  // if (options == null) options{
+  //   options = {};
+  // }
   //a crude attempt
-  parser = new Parser(options);
-  return parser;
+  //parser = new Parser(options);
+  //parser = new Parser();
+  return new Parser();
 };
 
-Parser = function(options) {
-
-  //constructor lets setup/check options
-  var base15, base1, base4, base6, k, v;
-  if (options == null) {
-    options = {};
-  }
-  options.objectMode = true;
-  this.options = {};
-  for (k in options) {
-    v = options[k];
-    this.options[k] = v;
-  }
-  stream.Transform.call(this, this.options);
-
-
-  // if ((base1 = this.options).delimiter == null) {
-  //   base1.delimiter = ',';
-  // }
-  // if ((base6 = this.options).objname == null) {
-  //   base6.objname = false;
-  // }
+Parser = function() {
+    stream.Transform.call(this,{objectMode: true});
   this.rowDelimiter;
   this.lines = 0;
   this.count = 0;
@@ -59,6 +40,7 @@ util.inherits(Parser, stream.Transform);
 module.exports.Parser = Parser;
 
 Parser.prototype._transform = function(chunk, encoding, callback) {
+  debugger;
   var err;
   if (chunk instanceof Buffer) {
     chunk = this.decoder.write(chunk);
@@ -87,7 +69,6 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
-  debugger;
   var field, i, j, len, lineAsColumns;
   if (this.columns === true) {
     this.columns = line;
@@ -157,7 +138,6 @@ Parser.prototype.__write = function(chars, end, callback) {
     if (isRowDelimiter) {
       this.lines++;
     }
-    debugger;
     isDelimiter = chars.substr(i, 1) === ",";
     if (isDelimiter || isRowDelimiter) {
       if (isRowDelimiter && this.line.length === 0 && this.field === '') {
@@ -202,10 +182,11 @@ Parser.prototype.__write = function(chars, end, callback) {
     } else {
 
       this.field += char;
-      i++;
+
       if (end && i === l) {
         this.line.push(this.field);
       }
+        i++;
 
     }
   }
@@ -250,7 +231,6 @@ csvTransform.on('readable', function() {
 });
 csvTransform.on('finish', function() {
   //the array need s to be filtered.
-  debugger;
   //sorting
 
 
@@ -260,4 +240,8 @@ csvTransform.on('finish', function() {
   fs.writeFile(__dirname + '/csv/growth_gdp_india.json', JSON.stringify(gdpGrowthOfIndia));
   fs.writeFile(__dirname + '/csv/continent_gdp_.json', JSON.stringify(gdpByContinent));
 
+});
+
+csvTransform.on('error', function(error) {
+  console.log(error.stack);
 });
