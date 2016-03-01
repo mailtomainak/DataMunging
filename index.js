@@ -38,9 +38,7 @@ Parser = function(options) {
   if ((base1 = this.options).delimiter == null) {
     base1.delimiter = ',';
   }
-  if ((base4 = this.options).columns == null) {
-    base4.columns = null;
-  }
+
   if ((base6 = this.options).objname == null) {
     base6.objname = false;
   }
@@ -53,6 +51,7 @@ Parser = function(options) {
   this.closingQuote = 0;
   this.line = [];
   this.chunks = [];
+  this.columns = true
   return this;
 };
 
@@ -89,17 +88,19 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
+  debugger;
   var field, i, j, len, lineAsColumns;
-  if (this.options.columns === true) {
-    this.options.columns = line;
+  if (this.columns === true) {
+    this.columns = line;
     return;
   }
   this.count++;
-  if (this.options.columns != null) {
+  if (this.columns != null) {
     lineAsColumns = {};
+    //an amazing loop
     for (i = j = 0, len = line.length; j < len; i = ++j) {
       field = line[i];
-      lineAsColumns[this.options.columns[i]] = field;
+      lineAsColumns[this.columns[i]] = field;
     }
     return this.push(lineAsColumns);
 
@@ -216,9 +217,7 @@ Parser.prototype.__write = function(chars, end, callback) {
   }
   return results;
 };
-var csvTransform = new Parser({
-  'columns': true
-});
+var csvTransform = new Parser();
 
 fs.createReadStream(__dirname + '/csv/WDI_Data.csv').pipe(csvTransform);
 var gdpGniConstant = [];
