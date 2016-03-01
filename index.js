@@ -9,36 +9,7 @@ StringDecoder = require('string_decoder').StringDecoder;
 fs = require('fs');
 
 module.exports = function() {
-  // var callback, called, chunks, data, options, parser;
-  // if (arguments.length === 3) {
-  //   data = arguments[0];
-  //   options = arguments[1];
-  //   callback = arguments[2];
-  //   if (typeof callback !== 'function') {
-  //     throw Error("Invalid callback argument: " + (JSON.stringify(callback)));
-  //   }
-  //   if (!(typeof data === 'string' || Buffer.isBuffer(arguments[0]))) {
-  //     return callback(Error("Invalid data argument: " + (JSON.stringify(data))));
-  //   }
-  // } else if (arguments.length === 2) {
-  //   debugger;
-  //   if (typeof arguments[0] === 'string' || Buffer.isBuffer(arguments[0])) {
-  //     data = arguments[0];
-  //   } else {
-  //     options = arguments[0];
-  //   }
-  //   if (typeof arguments[1] === 'function') {
-  //     callback = arguments[1];
-  //   } else {
-  //     options = arguments[1];
-  //   }
-  // } else if (arguments.length === 1) {
-  //   if (typeof arguments[0] === 'function') {
-  //     callback = arguments[0];
-  //   } else {
-  //     options = arguments[0];
-  //   }
-  // }
+  //set up options to make this independent
   if (options == null) {
     options = {};
   }
@@ -78,6 +49,8 @@ module.exports = function() {
 };
 
 Parser = function(options) {
+
+  //constructor lets setup/check options
   var base15, base1, base10, base11, base12, base2, base3, base4, base5, base6, base7, base8, base9, k, v;
   if (options == null) {
     options = {};
@@ -168,10 +141,10 @@ Parser.prototype._flush = function(callback) {
   var err;
   try {
     this.__write(this.decoder.end(), true);
-    if (this.quoting) {
-      this.emit('error', new Error("Quoted field not terminated at line " + (this.lines + 1)));
-      return;
-    }
+    // if (this.quoting) {
+    //   this.emit('error', new Error("Quoted field not terminated at line " + (this.lines + 1)));
+    //   return;
+    // }
     if (this.line.length > 0) {
       this.__push(this.line);
     }
@@ -183,7 +156,7 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
-
+  var _columnOnly = true;
   var field, i, j, len, lineAsColumns;
   if (this.options.columns === true) {
     this.options.columns = line;
@@ -196,11 +169,11 @@ Parser.prototype.__push = function(line) {
       field = line[i];
       lineAsColumns[this.options.columns[i]] = field;
     }
-    if (this.options.objname) {
-      return this.push([lineAsColumns[this.options.objname], lineAsColumns]);
-    } else {
-      return this.push(lineAsColumns);
-    }
+    // if (this.options.objname) {
+    //   return this.push([lineAsColumns[this.options.objname], lineAsColumns]);
+    // } else {
+    return this.push(lineAsColumns);
+    //}
   } else {
     return this.push(line);
   }
@@ -244,7 +217,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       escapeIsQuote = true;
       isEscape = this.nextChar === '"';
       isQuote = this.nextChar === '"';
-      if (!(escapeIsQuote && !this.field && !this.quoting) && (isEscape || isQuote)) {
+      if (!(escapeIsQuote && !this.field) && (isEscape || isQuote)) {
         i++;
         char = this.nextChar;
         this.nextChar = chars.charAt(i + 1);
