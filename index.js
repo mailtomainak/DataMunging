@@ -86,21 +86,21 @@ Parser = function(options) {
   if ((base7 = this.options).trim == null) {
     base7.trim = false;
   }
-  if ((base8 = this.options).ltrim == null) {
-    base8.ltrim = false;
-  }
-  if ((base9 = this.options).rtrim == null) {
-    base9.rtrim = false;
-  }
-  if ((base10 = this.options).auto_parse == null) {
-    base10.auto_parse = false;
-  }
-  if ((base11 = this.options).auto_parse_date == null) {
-    base11.auto_parse_date = false;
-  }
-  if ((base12 = this.options).skip_empty_lines == null) {
-    base12.skip_empty_lines = false;
-  }
+  // if ((base8 = this.options).ltrim == null) {
+  //   base8.ltrim = false;
+  // }
+  // if ((base9 = this.options).rtrim == null) {
+  //   base9.rtrim = false;
+  // }
+  // if ((base10 = this.options).auto_parse == null) {
+  //   base10.auto_parse = false;
+  // }
+  // if ((base11 = this.options).auto_parse_date == null) {
+  //   base11.auto_parse_date = false;
+  // }
+  // if ((base12 = this.options).skip_empty_lines == null) {
+  //   base12.skip_empty_lines = false;
+  // }
   this.lines = 0;
   this.count = 0;
   //  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
@@ -109,7 +109,7 @@ Parser = function(options) {
   // };
   this.decoder = new StringDecoder();
   this.buf = '';
-  this.quoting = false;
+  //this.quoting = false;
   this.commenting = false;
   this.field = '';
   this.nextChar = null;
@@ -197,7 +197,7 @@ Parser.prototype.__write = function(chars, end, callback) {
     }
     char = this.nextChar ? this.nextChar : chars.charAt(i);
     this.nextChar = chars.charAt(i + 1);
-    if (this.options.rowDelimiter == null) {
+  //  if (this.options.rowDelimiter == null) {
       if ((this.field === '') && (char === '\n' || char === '\r')) {
         rowDelimiter = char;
         nextCharPos = i + 1;
@@ -212,12 +212,12 @@ Parser.prototype.__write = function(chars, end, callback) {
         this.options.rowDelimiter = rowDelimiter;
         rowDelimiterLength = this.options.rowDelimiter.length;
       }
-    }
+    //}
     if (char === "\"") {
       escapeIsQuote = true;
       isEscape = this.nextChar === '"';
       isQuote = this.nextChar === '"';
-      if (!(escapeIsQuote && !this.field) && (isEscape || isQuote)) {
+      if (!(escapeIsQuote && !this.field)) {
         i++;
         char = this.nextChar;
         this.nextChar = chars.charAt(i + 1);
@@ -226,50 +226,50 @@ Parser.prototype.__write = function(chars, end, callback) {
         continue;
       }
     }
-    if (char === this.options.quote) {
-      if (this.quoting) {
-        areNextCharsRowDelimiters = this.options.rowDelimiter && chars.substr(i + 1, this.options.rowDelimiter.length) === this.options.rowDelimiter;
-        areNextCharsDelimiter = chars.substr(i + 1, this.options.delimiter.length) === this.options.delimiter;
-        isNextCharAComment = this.nextChar === this.options.comment;
-        if (this.nextChar && !areNextCharsRowDelimiters && !areNextCharsDelimiter && !isNextCharAComment) {
-          if (this.options.relax) {
-            this.quoting = false;
-            this.field = "" + this.options.quote + this.field;
-          } else {
-            throw Error("Invalid closing quote at line " + (this.lines + 1) + "; found " + (JSON.stringify(this.nextChar)) + " instead of delimiter " + (JSON.stringify(this.options.delimiter)));
-          }
-        } else {
-          this.quoting = false;
-          this.closingQuote = this.options.quote.length;
-          i++;
-          if (end && i === l) {
-            this.line.push(this.field);
-          }
-          continue;
-        }
-      } else if (!this.field) {
-        this.quoting = true;
-        i++;
-        continue;
-      } else if (this.field && !this.options.relax) {
-        throw Error("Invalid opening quote at line " + (this.lines + 1));
-      }
-    }
+    // if (char === this.options.quote) {
+    //   if (this.quoting) {
+    //     areNextCharsRowDelimiters = this.options.rowDelimiter && chars.substr(i + 1, this.options.rowDelimiter.length) === this.options.rowDelimiter;
+    //     areNextCharsDelimiter = chars.substr(i + 1, this.options.delimiter.length) === this.options.delimiter;
+    //     isNextCharAComment = this.nextChar === this.options.comment;
+    //     if (this.nextChar && !areNextCharsRowDelimiters && !areNextCharsDelimiter && !isNextCharAComment) {
+    //       if (this.options.relax) {
+    //         this.quoting = false;
+    //         this.field = "" + this.options.quote + this.field;
+    //       } else {
+    //         throw Error("Invalid closing quote at line " + (this.lines + 1) + "; found " + (JSON.stringify(this.nextChar)) + " instead of delimiter " + (JSON.stringify(this.options.delimiter)));
+    //       }
+    //     } else {
+    //       this.quoting = false;
+    //       this.closingQuote = this.options.quote.length;
+    //       i++;
+    //       if (end && i === l) {
+    //         this.line.push(this.field);
+    //       }
+    //       continue;
+    //     }
+    //   } else if (!this.field) {
+    //     this.quoting = true;
+    //     i++;
+    //     continue;
+    //   } else if (this.field && !this.options.relax) {
+    //     throw Error("Invalid opening quote at line " + (this.lines + 1));
+    //   }
+    // }
     isRowDelimiter = this.options.rowDelimiter && chars.substr(i, this.options.rowDelimiter.length) === this.options.rowDelimiter;
     if (isRowDelimiter) {
       this.lines++;
     }
     wasCommenting = false;
-    if (!this.commenting && !this.quoting && this.options.comment && chars.substr(i, this.options.comment.length) === this.options.comment) {
+    if (!this.commenting && this.options.comment && chars.substr(i, this.options.comment.length) === this.options.comment) {
       this.commenting = true;
     } else if (this.commenting && isRowDelimiter) {
       wasCommenting = true;
       this.commenting = false;
     }
     isDelimiter = chars.substr(i, this.options.delimiter.length) === this.options.delimiter;
-    if (!this.commenting && !this.quoting && (isDelimiter || isRowDelimiter)) {
+    if (!this.commenting  && (isDelimiter || isRowDelimiter)) {
       if (isRowDelimiter && this.line.length === 0 && this.field === '') {
-        if (wasCommenting || this.options.skip_empty_lines) {
+        if (wasCommenting) {
           i += this.options.rowDelimiter.length;
           this.nextChar = chars.charAt(i);
           continue;
@@ -298,7 +298,7 @@ Parser.prototype.__write = function(chars, end, callback) {
         this.nextChar = chars.charAt(i);
         continue;
       }
-    } else if (!this.commenting && !this.quoting && (char === ' ' || char === '\t')) {
+    } else if (!this.commenting && (char === ' ' || char === '\t')) {
       if (!(ltrim && !this.field)) {
         this.field += char;
       }
