@@ -51,7 +51,7 @@ module.exports = function() {
 Parser = function(options) {
 
   //constructor lets setup/check options
-  var base15, base1, base10, base11, base12, base2, base3, base4, base5, base6, base7, base8, base9, k, v;
+  var base15, base1, base4, base6, k, v;
   if (options == null) {
     options = {};
   }
@@ -121,8 +121,7 @@ Parser.prototype._flush = function(callback) {
 };
 
 Parser.prototype.__push = function(line) {
-  var _columnOnly = true;
-  var field, i, j, len, lineAsColumns;
+    var field, i, j, len, lineAsColumns;
   if (this.options.columns === true) {
     this.options.columns = line;
     return;
@@ -142,7 +141,7 @@ Parser.prototype.__push = function(line) {
 };
 
 Parser.prototype.__write = function(chars, end, callback) {
-  var acceptedLength, areNextCharsDelimiter, areNextCharsRowDelimiters, auto_parse, char, escapeIsQuote, i, isDelimiter, isEscape, isNextCharAComment, isQuote, isRowDelimiter, is_float, is_int, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
+  var acceptedLength, char, escapeIsQuote, i, isDelimiter, isEscape,isQuote, isRowDelimiter, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
   ltrim = false;
   rtrim = false;
   chars = this.buf + chars;
@@ -254,8 +253,6 @@ var csvTransform = new Parser({
 });
 
 fs.createReadStream(__dirname + '/csv/WDI_Data.csv').pipe(csvTransform);
-var myArr = [];
-
 var gdpGniConstant = [];
 var gdpGniPerCapita = [];
 var gdpGrowthOfIndia = [];
