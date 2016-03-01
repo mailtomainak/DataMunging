@@ -129,10 +129,10 @@ Parser = function(options) {
   }
   this.lines = 0;
   this.count = 0;
-  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
-  this.is_float = function(value) {
-    return (value - parseFloat(value) + 1) >= 0;
-  };
+//  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
+  // this.is_float = function(value) {
+  //   return (value - parseFloat(value) + 1) >= 0;
+  // };
   this.decoder = new StringDecoder();
   this.buf = '';
   this.quoting = false;
@@ -187,9 +187,6 @@ Parser.prototype.__push = function(line) {
   if (this.options.columns === true) {
     this.options.columns = line;
     return;
-  } else if (typeof this.options.columns === 'function') {
-    this.options.columns = this.options.columns(line);
-    return;
   }
   this.count++;
   if (this.options.columns != null) {
@@ -210,41 +207,6 @@ Parser.prototype.__push = function(line) {
 
 Parser.prototype.__write = function(chars, end, callback) {
   var acceptedLength, areNextCharsDelimiter, areNextCharsRowDelimiters, auto_parse, char, escapeIsQuote, i, isDelimiter, isEscape, isNextCharAComment, isQuote, isRowDelimiter, is_float, is_int, l, ltrim, nextCharPos, ref, results, rowDelimiter, rowDelimiterLength, rtrim, wasCommenting;
-  is_int = (function(_this) {
-    return function(value) {
-      if (typeof _this.is_int === 'function') {
-        return _this.is_int(value);
-      } else {
-        return _this.is_int.test(value);
-      }
-    };
-  })(this);
-  is_float = (function(_this) {
-    return function(value) {
-      if (typeof _this.is_float === 'function') {
-        return _this.is_float(value);
-      } else {
-        return _this.is_float.test(value);
-      }
-    };
-  })(this);
-  auto_parse = (function(_this) {
-    return function(value) {
-      // var m;
-      // if (_this.options.auto_parse && is_int(_this.field)) {
-      //   _this.field = parseInt(_this.field);
-      // } else if (_this.options.auto_parse && is_float(_this.field)) {
-      //   _this.field = parseFloat(_this.field);
-      // } else if (_this.options.auto_parse && _this.options.auto_parse_date) {
-      //   m = Date.parse(_this.field);
-      //   if (!isNaN(m)) {
-      //     _this.field = new Date(m);
-      //   }
-      // }
-      return _this.field;
-    };
-  })(this);
-
   debugger;
   // ltrim = this.options.trim || this.options.ltrim;
   // rtrim = this.options.trim || this.options.rtrim;
@@ -252,20 +214,14 @@ Parser.prototype.__write = function(chars, end, callback) {
   rtrim=false;
   chars = this.buf + chars;
   l = chars.length;
-  //rowDelimiterLength = this.options.rowDelimiter ? this.options.rowDelimiter.length : 0;
-//FUCKING GLOBAL?
   rowDelimiterLength=0;
   i = 0;
   if (this.lines === 0 && 0xFEFF === chars.charCodeAt(0)) {
     i++;
   }
   while (i < l) {
-  //  acceptedLength = rowDelimiterLength + this.options.comment.length + this.options.escape.length + this.options.delimiter.length;
-    acceptedLength=2;
-    // if (this.quoting) {
-    //   acceptedLength += this.options.quote.length;
-    // }
-    if (!end && (i + acceptedLength >= l)) {
+      acceptedLength=2;
+      if (!end && (i + acceptedLength >= l)) {
       break;
     }
     char = this.nextChar ? this.nextChar : chars.charAt(i);
@@ -286,8 +242,7 @@ Parser.prototype.__write = function(chars, end, callback) {
         rowDelimiterLength = this.options.rowDelimiter.length;
       }
     }
-  //  if (!this.commenting && char === this.options.escape) {
-  if (char === "\"") {
+    if (char === "\"") {
       escapeIsQuote = true;
       isEscape = this.nextChar === '"';
       isQuote = this.nextChar === '"';
@@ -354,7 +309,7 @@ Parser.prototype.__write = function(chars, end, callback) {
           this.field = this.field.trimRight();
         }
       }
-      this.line.push(auto_parse(this.field));
+      this.line.push(this.field);
       this.closingQuote = 0;
       this.field = '';
       if (isDelimiter) {
