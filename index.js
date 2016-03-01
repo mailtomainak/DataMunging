@@ -68,45 +68,14 @@ Parser = function(options) {
   if ((base1 = this.options).delimiter == null) {
     base1.delimiter = ',';
   }
-  if ((base2 = this.options).quote == null) {
-    base2.quote = '"';
-  }
-  if ((base3 = this.options).escape == null) {
-    base3.escape = '"';
-  }
   if ((base4 = this.options).columns == null) {
     base4.columns = null;
-  }
-  if ((base5 = this.options).comment == null) {
-    base5.comment = '';
   }
   if ((base6 = this.options).objname == null) {
     base6.objname = false;
   }
-  if ((base7 = this.options).trim == null) {
-    base7.trim = false;
-  }
-  // if ((base8 = this.options).ltrim == null) {
-  //   base8.ltrim = false;
-  // }
-  // if ((base9 = this.options).rtrim == null) {
-  //   base9.rtrim = false;
-  // }
-  // if ((base10 = this.options).auto_parse == null) {
-  //   base10.auto_parse = false;
-  // }
-  // if ((base11 = this.options).auto_parse_date == null) {
-  //   base11.auto_parse_date = false;
-  // }
-  // if ((base12 = this.options).skip_empty_lines == null) {
-  //   base12.skip_empty_lines = false;
-  // }
   this.lines = 0;
   this.count = 0;
-  //  this.is_int = /^(\-|\+)?([1-9]+[0-9]*)$/;
-  // this.is_float = function(value) {
-  //   return (value - parseFloat(value) + 1) >= 0;
-  // };
   this.decoder = new StringDecoder();
   this.buf = '';
   //this.quoting = false;
@@ -141,11 +110,7 @@ Parser.prototype._flush = function(callback) {
   var err;
   try {
     this.__write(this.decoder.end(), true);
-    // if (this.quoting) {
-    //   this.emit('error', new Error("Quoted field not terminated at line " + (this.lines + 1)));
-    //   return;
-    // }
-    if (this.line.length > 0) {
+      if (this.line.length > 0) {
       this.__push(this.line);
     }
     return callback();
@@ -169,11 +134,8 @@ Parser.prototype.__push = function(line) {
       field = line[i];
       lineAsColumns[this.options.columns[i]] = field;
     }
-    // if (this.options.objname) {
-    //   return this.push([lineAsColumns[this.options.objname], lineAsColumns]);
-    // } else {
     return this.push(lineAsColumns);
-    //}
+
   } else {
     return this.push(line);
   }
@@ -197,22 +159,20 @@ Parser.prototype.__write = function(chars, end, callback) {
     }
     char = this.nextChar ? this.nextChar : chars.charAt(i);
     this.nextChar = chars.charAt(i + 1);
-  //  if (this.options.rowDelimiter == null) {
-      if ((this.field === '') && (char === '\n' || char === '\r')) {
-        rowDelimiter = char;
-        nextCharPos = i + 1;
-      } else if (this.nextChar === '\n' || this.nextChar === '\r') {
-        rowDelimiter = this.nextChar;
-        nextCharPos = i + 2;
+    if ((this.field === '') && (char === '\n' || char === '\r')) {
+      rowDelimiter = char;
+      nextCharPos = i + 1;
+    } else if (this.nextChar === '\n' || this.nextChar === '\r') {
+      rowDelimiter = this.nextChar;
+      nextCharPos = i + 2;
+    }
+    if (rowDelimiter) {
+      if (rowDelimiter === '\r' && chars.charAt(nextCharPos) === '\n') {
+        rowDelimiter += '\n';
       }
-      if (rowDelimiter) {
-        if (rowDelimiter === '\r' && chars.charAt(nextCharPos) === '\n') {
-          rowDelimiter += '\n';
-        }
-        this.options.rowDelimiter = rowDelimiter;
-        rowDelimiterLength = this.options.rowDelimiter.length;
-      }
-    //}
+      this.options.rowDelimiter = rowDelimiter;
+      rowDelimiterLength = this.options.rowDelimiter.length;
+    }
     if (char === "\"") {
       escapeIsQuote = true;
       isEscape = this.nextChar === '"';
@@ -226,48 +186,12 @@ Parser.prototype.__write = function(chars, end, callback) {
         continue;
       }
     }
-    // if (char === this.options.quote) {
-    //   if (this.quoting) {
-    //     areNextCharsRowDelimiters = this.options.rowDelimiter && chars.substr(i + 1, this.options.rowDelimiter.length) === this.options.rowDelimiter;
-    //     areNextCharsDelimiter = chars.substr(i + 1, this.options.delimiter.length) === this.options.delimiter;
-    //     isNextCharAComment = this.nextChar === this.options.comment;
-    //     if (this.nextChar && !areNextCharsRowDelimiters && !areNextCharsDelimiter && !isNextCharAComment) {
-    //       if (this.options.relax) {
-    //         this.quoting = false;
-    //         this.field = "" + this.options.quote + this.field;
-    //       } else {
-    //         throw Error("Invalid closing quote at line " + (this.lines + 1) + "; found " + (JSON.stringify(this.nextChar)) + " instead of delimiter " + (JSON.stringify(this.options.delimiter)));
-    //       }
-    //     } else {
-    //       this.quoting = false;
-    //       this.closingQuote = this.options.quote.length;
-    //       i++;
-    //       if (end && i === l) {
-    //         this.line.push(this.field);
-    //       }
-    //       continue;
-    //     }
-    //   } else if (!this.field) {
-    //     this.quoting = true;
-    //     i++;
-    //     continue;
-    //   } else if (this.field && !this.options.relax) {
-    //     throw Error("Invalid opening quote at line " + (this.lines + 1));
-    //   }
-    // }
     isRowDelimiter = this.options.rowDelimiter && chars.substr(i, this.options.rowDelimiter.length) === this.options.rowDelimiter;
     if (isRowDelimiter) {
       this.lines++;
     }
-    wasCommenting = false;
-    if (!this.commenting && this.options.comment && chars.substr(i, this.options.comment.length) === this.options.comment) {
-      this.commenting = true;
-    } else if (this.commenting && isRowDelimiter) {
-      wasCommenting = true;
-      this.commenting = false;
-    }
     isDelimiter = chars.substr(i, this.options.delimiter.length) === this.options.delimiter;
-    if (!this.commenting  && (isDelimiter || isRowDelimiter)) {
+    if (!this.commenting && (isDelimiter || isRowDelimiter)) {
       if (isRowDelimiter && this.line.length === 0 && this.field === '') {
         if (wasCommenting) {
           i += this.options.rowDelimiter.length;
@@ -303,9 +227,7 @@ Parser.prototype.__write = function(chars, end, callback) {
         this.field += char;
       }
       if (end && i + 1 === l) {
-        if (this.options.trim || this.options.rtrim) {
-          this.field = this.field.trimRight();
-        }
+        this.field = this.field.trimRight();
         this.line.push(this.field);
       }
       i++;
@@ -331,7 +253,6 @@ var csvTransform = new Parser({
   'columns': true
 });
 
-//writeStream = fs.createWriteStream(__dirname + '/csv/test.txt')
 fs.createReadStream(__dirname + '/csv/WDI_Data.csv').pipe(csvTransform);
 var myArr = [];
 
