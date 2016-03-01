@@ -32,16 +32,15 @@ Parser = function(options) {
     this.options[k] = v;
   }
   stream.Transform.call(this, this.options);
-  if ((base15 = this.options).rowDelimiter == null) {
-    base15.rowDelimiter = null;
-  }
-  if ((base1 = this.options).delimiter == null) {
-    base1.delimiter = ',';
-  }
 
-  if ((base6 = this.options).objname == null) {
-    base6.objname = false;
-  }
+
+  // if ((base1 = this.options).delimiter == null) {
+  //   base1.delimiter = ',';
+  // }
+  // if ((base6 = this.options).objname == null) {
+  //   base6.objname = false;
+  // }
+  this.rowDelimiter;
   this.lines = 0;
   this.count = 0;
   this.decoder = new StringDecoder();
@@ -138,8 +137,8 @@ Parser.prototype.__write = function(chars, end, callback) {
       if (rowDelimiter === '\r' && chars.charAt(nextCharPos) === '\n') {
         rowDelimiter += '\n';
       }
-      this.options.rowDelimiter = rowDelimiter;
-      rowDelimiterLength = this.options.rowDelimiter.length;
+      this.rowDelimiter = rowDelimiter;
+      rowDelimiterLength = this.rowDelimiter.length;
     }
     if (char === "\"") {
       escapeIsQuote = true;
@@ -154,15 +153,16 @@ Parser.prototype.__write = function(chars, end, callback) {
         continue;
       }
     }
-    isRowDelimiter = this.options.rowDelimiter && chars.substr(i, this.options.rowDelimiter.length) === this.options.rowDelimiter;
+    isRowDelimiter = this.rowDelimiter && chars.substr(i, this.rowDelimiter.length) === this.rowDelimiter;
     if (isRowDelimiter) {
       this.lines++;
     }
-    isDelimiter = chars.substr(i, this.options.delimiter.length) === this.options.delimiter;
+    debugger;
+    isDelimiter = chars.substr(i, 1) === ",";
     if (isDelimiter || isRowDelimiter) {
       if (isRowDelimiter && this.line.length === 0 && this.field === '') {
         if (wasCommenting) {
-          i += this.options.rowDelimiter.length;
+          i += this.rowDelimiter.length;
           this.nextChar = chars.charAt(i);
           continue;
         }
@@ -176,7 +176,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       this.closingQuote = 0;
       this.field = '';
       if (isDelimiter) {
-        i += this.options.delimiter.length;
+        i +=1;
         this.nextChar = chars.charAt(i);
         if (end && !this.nextChar) {
           isRowDelimiter = true;
@@ -186,7 +186,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       if (isRowDelimiter) {
         this.__push(this.line);
         this.line = [];
-        i += (ref = this.options.rowDelimiter) != null ? ref.length : void 0;
+        i += (ref = this.rowDelimiter) != null ? ref.length : void 0;
         this.nextChar = chars.charAt(i);
         continue;
       }
