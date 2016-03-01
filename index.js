@@ -406,22 +406,39 @@ var gdpGniPerCapita = [];
 var gdpGrowthOfIndia = [];
 var gdpByContinent = [];
 var gdpGniKeyArray = ['GDP at market prices (constant 2005 US$)', 'GNI (constant 2005 US$)'];
-var gdpGniPerCapitaKeyArray = ['GDP per capita (constant 2005 US$)','GNI per capita (constant 2005 US$)' ];
+var gdpGniPerCapitaKeyArray = ['GDP per capita (constant 2005 US$)', 'GNI per capita (constant 2005 US$)'];
+var gdpGrowthIndiaKey = 'GDP growth (annual %)';
+var indiaCountryName = 'India';
+var aggregatedGdpPerCapitaKey ='GDP per capita (constant 2005 US$)';
+
 csvTransform.on('readable', function() {
   while (record = csvTransform.read()) {
     //array is becoming big they should be split here!
+    //filtering
     if (gdpGniKeyArray.indexOf(record['Indicator Name']) > 0) {
       gdpGniConstant.push(record);
     }
     if (gdpGniPerCapitaKeyArray.indexOf(record['Indicator Name']) > 0) {
       gdpGniPerCapita.push(record);
     }
+    if (record['Indicator Name'] === gdpGrowthIndiaKey && record['Country Name'] === indiaCountryName) {
+      gdpGrowthOfIndia.push(record);
+    }
+    if (record['Indicator Name'] === aggregatedGdpPerCapitaKey) {
+      gdpByContinent.push(record);
+    }
   }
 });
 csvTransform.on('finish', function() {
   //the array need s to be filtered.
   debugger;
-  gdpGniConstant;
+  //sorting
+
+
+//write file
   fs.writeFile(__dirname + '/csv/test_gdp.json', JSON.stringify(gdpGniConstant));
-    fs.writeFile(__dirname + '/csv/test_gni.json', JSON.stringify(gdpGniPerCapita));
+  fs.writeFile(__dirname + '/csv/test_gni.json', JSON.stringify(gdpGniPerCapita));
+  fs.writeFile(__dirname + '/csv/growth_gdp_india.json', JSON.stringify(gdpGrowthOfIndia));
+  fs.writeFile(__dirname + '/csv/continent_gdp_.json', JSON.stringify(gdpByContinent));
+
 });
