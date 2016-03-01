@@ -77,7 +77,7 @@ module.exports = function() {
 };
 
 Parser = function(options) {
-  var base, base1, base10, base11, base12, base2, base3, base4, base5, base6, base7, base8, base9, k, v;
+  var base15, base1, base10, base11, base12, base2, base3, base4, base5, base6, base7, base8, base9, k, v;
   if (options == null) {
     options = {};
   }
@@ -88,8 +88,8 @@ Parser = function(options) {
     this.options[k] = v;
   }
   stream.Transform.call(this, this.options);
-  if ((base = this.options).rowDelimiter == null) {
-    base.rowDelimiter = null;
+  if ((base15 = this.options).rowDelimiter == null) {
+    base15.rowDelimiter = null;
   }
   if ((base1 = this.options).delimiter == null) {
     base1.delimiter = ',';
@@ -230,17 +230,17 @@ Parser.prototype.__write = function(chars, end, callback) {
   })(this);
   auto_parse = (function(_this) {
     return function(value) {
-      var m;
-      if (_this.options.auto_parse && is_int(_this.field)) {
-        _this.field = parseInt(_this.field);
-      } else if (_this.options.auto_parse && is_float(_this.field)) {
-        _this.field = parseFloat(_this.field);
-      } else if (_this.options.auto_parse && _this.options.auto_parse_date) {
-        m = Date.parse(_this.field);
-        if (!isNaN(m)) {
-          _this.field = new Date(m);
-        }
-      }
+      // var m;
+      // if (_this.options.auto_parse && is_int(_this.field)) {
+      //   _this.field = parseInt(_this.field);
+      // } else if (_this.options.auto_parse && is_float(_this.field)) {
+      //   _this.field = parseFloat(_this.field);
+      // } else if (_this.options.auto_parse && _this.options.auto_parse_date) {
+      //   m = Date.parse(_this.field);
+      //   if (!isNaN(m)) {
+      //     _this.field = new Date(m);
+      //   }
+      // }
       return _this.field;
     };
   })(this);
