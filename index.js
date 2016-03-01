@@ -244,20 +244,27 @@ Parser.prototype.__write = function(chars, end, callback) {
       return _this.field;
     };
   })(this);
-  ltrim = this.options.trim || this.options.ltrim;
-  rtrim = this.options.trim || this.options.rtrim;
+
+  debugger;
+  // ltrim = this.options.trim || this.options.ltrim;
+  // rtrim = this.options.trim || this.options.rtrim;
+  ltrim=false;
+  rtrim=false;
   chars = this.buf + chars;
   l = chars.length;
-  rowDelimiterLength = this.options.rowDelimiter ? this.options.rowDelimiter.length : 0;
+  //rowDelimiterLength = this.options.rowDelimiter ? this.options.rowDelimiter.length : 0;
+//FUCKING GLOBAL?
+  rowDelimiterLength=0;
   i = 0;
   if (this.lines === 0 && 0xFEFF === chars.charCodeAt(0)) {
     i++;
   }
   while (i < l) {
-    acceptedLength = rowDelimiterLength + this.options.comment.length + this.options.escape.length + this.options.delimiter.length;
-    if (this.quoting) {
-      acceptedLength += this.options.quote.length;
-    }
+  //  acceptedLength = rowDelimiterLength + this.options.comment.length + this.options.escape.length + this.options.delimiter.length;
+    acceptedLength=2;
+    // if (this.quoting) {
+    //   acceptedLength += this.options.quote.length;
+    // }
     if (!end && (i + acceptedLength >= l)) {
       break;
     }
@@ -279,10 +286,11 @@ Parser.prototype.__write = function(chars, end, callback) {
         rowDelimiterLength = this.options.rowDelimiter.length;
       }
     }
-    if (!this.commenting && char === this.options.escape) {
-      escapeIsQuote = this.options.escape === this.options.quote;
-      isEscape = this.nextChar === this.options.escape;
-      isQuote = this.nextChar === this.options.quote;
+  //  if (!this.commenting && char === this.options.escape) {
+  if (char === "\"") {
+      escapeIsQuote = true;
+      isEscape = this.nextChar === '"';
+      isQuote = this.nextChar === '"';
       if (!(escapeIsQuote && !this.field && !this.quoting) && (isEscape || isQuote)) {
         i++;
         char = this.nextChar;
@@ -292,7 +300,7 @@ Parser.prototype.__write = function(chars, end, callback) {
         continue;
       }
     }
-    if (!this.commenting && char === this.options.quote) {
+    if (char === this.options.quote) {
       if (this.quoting) {
         areNextCharsRowDelimiters = this.options.rowDelimiter && chars.substr(i + 1, this.options.rowDelimiter.length) === this.options.rowDelimiter;
         areNextCharsDelimiter = chars.substr(i + 1, this.options.delimiter.length) === this.options.delimiter;
@@ -309,7 +317,7 @@ Parser.prototype.__write = function(chars, end, callback) {
           this.closingQuote = this.options.quote.length;
           i++;
           if (end && i === l) {
-            this.line.push(auto_parse(this.field));
+            this.line.push(this.field);
           }
           continue;
         }
@@ -372,14 +380,14 @@ Parser.prototype.__write = function(chars, end, callback) {
         if (this.options.trim || this.options.rtrim) {
           this.field = this.field.trimRight();
         }
-        this.line.push(auto_parse(this.field));
+        this.line.push(this.field);
       }
       i++;
     } else if (!this.commenting) {
       this.field += char;
       i++;
       if (end && i === l) {
-        this.line.push(auto_parse(this.field));
+        this.line.push(this.field);
       }
     } else {
       i++;
