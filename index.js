@@ -13,38 +13,8 @@ module.exports = function() {
   if (options == null) {
     options = {};
   }
+  //a crude attempt
   parser = new Parser(options);
-  if (data != null) {
-    process.nextTick(function() {
-      parser.write(data);
-      return parser.end();
-    });
-  }
-  if (callback) {
-    called = false;
-    chunks = options.objname ? {} : [];
-    parser.on('readable', function() {
-      var chunk, results;
-      results = [];
-      while (chunk = parser.read()) {
-        if (options.objname) {
-          results.push(chunks[chunk[0]] = chunk[1]);
-        } else {
-          results.push(chunks.push(chunk));
-        }
-      }
-      return results;
-    });
-    parser.on('error', function(err) {
-      called = true;
-      return callback(err);
-    });
-    parser.on('end', function() {
-      if (!called) {
-        return callback(null, chunks);
-      }
-    });
-  }
   return parser;
 };
 
