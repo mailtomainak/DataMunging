@@ -20,7 +20,9 @@ module.exports = function() {
 };
 
 Parser = function() {
-    stream.Transform.call(this,{objectMode: true});
+  stream.Transform.call(this, {
+    objectMode: true
+  });
   this.rowDelimiter;
   this.lines = 0;
   this.count = 0;
@@ -40,7 +42,7 @@ util.inherits(Parser, stream.Transform);
 module.exports.Parser = Parser;
 
 Parser.prototype._transform = function(chunk, encoding, callback) {
-  debugger;
+
   var err;
   if (chunk instanceof Buffer) {
     chunk = this.decoder.write(chunk);
@@ -156,7 +158,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       this.closingQuote = 0;
       this.field = '';
       if (isDelimiter) {
-        i +=1;
+        i += 1;
         this.nextChar = chars.charAt(i);
         if (end && !this.nextChar) {
           isRowDelimiter = true;
@@ -186,7 +188,7 @@ Parser.prototype.__write = function(chars, end, callback) {
       if (end && i === l) {
         this.line.push(this.field);
       }
-        i++;
+      i++;
 
     }
   }
@@ -198,7 +200,27 @@ Parser.prototype.__write = function(chars, end, callback) {
   }
   return results;
 };
+
+//code above this to move to module
 var csvTransform = new Parser();
+
+var convertToFloat = function(val) {
+
+  for (var key in val) {
+    if (val.hasOwnProperty(key) && (val - parseFloat(val) + 1) >= 0) {
+      val[key] = parseFloat(val[key]);
+    }
+  }
+  return val;
+};
+//
+// function search(nameKey, myArray){
+//     for (var i=0; i < myArray.length; i++) {
+//         if (myArray[i].name === nameKey) {
+//             return myArray[i];
+//         }
+//     }
+// }
 
 fs.createReadStream(__dirname + '/csv/WDI_Data.csv').pipe(csvTransform);
 var gdpGniConstant = [];
@@ -215,10 +237,23 @@ csvTransform.on('readable', function() {
   while (record = csvTransform.read()) {
     //array is becoming big they should be split here!
     //filtering
-    if (gdpGniKeyArray.indexOf(record['Indicator Name']) > 0) {
-      gdpGniConstant.push(record);
+    switch (record['Indicator Name']) {
+      case 'GDP at market prices (constant 2005 US$)':
+        gdpGniConstant.push({
+          country: record['Country Name'],
+          gdp: parseFloat(record['2005'])
+        });
+        break;
+      case 'GNI (constant 2005 US$)':
+        gdpGniConstant.push({
+          country: record['Country Name'],
+          gni: parseFloat(record['2005'])
+        });
+        break;
+      default:
+
     }
-    if (gdpGniPerCapitaKeyArray.indexOf(record['Indicator Name']) > 0) {
+    if (record['Indicator Name'] === 'GDP per capita (constant 2005 US$)' || record['Indicator Name'] === 'GNI per capita (constant 2005 US$)') {
       gdpGniPerCapita.push(record);
     }
     if (record['Indicator Name'] === gdpGrowthIndiaKey && record['Country Name'] === indiaCountryName) {
@@ -230,12 +265,25 @@ csvTransform.on('readable', function() {
   }
 });
 csvTransform.on('finish', function() {
-  //the array need s to be filtered.
-  //sorting
-
-
+  gdpGniConstant.sort(function(x, y) {
+    return x.gdp - y.gdp
+  }).reverse().slice(0, 15);
+  // var temp = [];
+  // var gni = 0;
+  // debugger;
+  // for (var i = 0; i < gdpGniConstant.length; i++) {
+  //   var country = gdpGniConstant[i].country;
+  //   for (var j = 0; j < gdpGniConstant.length ; j++) {
+  //     if (gdpGniConstant[j].country === country) {
+  //       gni = gdpGniConstant[j].gni;
+  //       break;
+  //     }
+  //   }
+  //    gdpGniConstant[i].gni=gni;
+  //    temp.push(gdpGniConstant);
+  // }
   //write file
-  fs.writeFile(__dirname + '/csv/test_gdp.json', JSON.stringify(gdpGniConstant));
+  fs.writeFile(__dirname + '/csv/test_gdp.json', JSON.stringify(temp));
   fs.writeFile(__dirname + '/csv/test_gni.json', JSON.stringify(gdpGniPerCapita));
   fs.writeFile(__dirname + '/csv/growth_gdp_india.json', JSON.stringify(gdpGrowthOfIndia));
   fs.writeFile(__dirname + '/csv/continent_gdp_.json', JSON.stringify(gdpByContinent));
