@@ -68,27 +68,10 @@ csvTransform.on('finish', function() {
   gdpGniConstant.sort(function(x, y) {
     return x.gdp - y.gdp
   }).reverse().slice(0, 15);
-
-  // var temp = [];
-  // var gni = 0;
-  // debugger;
-  // for (var i = 0; i < gdpGniConstant.length; i++) {
-  //   var country = gdpGniConstant[i].country;
-  //   for (var j = 0; j < gdpGniConstant.length ; j++) {
-  //     if (gdpGniConstant[j].country === country) {
-  //       gni = gdpGniConstant[j].gni;
-  //       break;
-  //     }
-  //   }
-  //    gdpGniConstant[i].gni=gni;
-  //    temp.push(gdpGniConstant);
-  // }
-  //write file
   fs.writeFile(__dirname + '/csv/test_gdp.json', JSON.stringify(gdpGniConstant));
   fs.writeFile(__dirname + '/csv/test_gni.json', JSON.stringify(gdpGniPerCapita));
   fs.writeFile(__dirname + '/csv/growth_gdp_india.json', JSON.stringify(gdpGrowthOfIndia));
   fs.writeFile(__dirname + '/csv/continent_gdp_.json', JSON.stringify(gdpByContinent));
-
 });
 
 csvTransform.on('error', function(error) {

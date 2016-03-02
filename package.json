@@ -15,5 +15,6 @@
   "bugs": {
     "url": "https://github.com/mailtomainak/DataMunging/issues"
   },
-  "homepage": "https://github.com/mailtomainak/DataMunging#readme"
+  "homepage": "https://github.com/mailtomainak/DataMunging#readme",
+  "dependencies": {}
 }
